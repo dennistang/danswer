@@ -168,6 +168,17 @@ def convert_lm_input_to_basic_string(lm_input: LanguageModelInput) -> str:
     https://github.com/langchain-ai/langchain/blob/master/libs/langchain/langchain/chat_models/base.py#L86
     """
     prompt_value = None
+
+    # Get type of prompt_value
+    prompt_value_type = type(lm_input)
+    logger.warning(f"Prompt value type: {prompt_value_type}")
+
+    # Log each item in lm_input that is class 'list'
+    if isinstance(lm_input, list):
+        for item in lm_input:
+            logger.warning(f"Item type: {type(item)}")
+            logger.warning(f"Item: {item}")
+
     if isinstance(lm_input, PromptValue):
         prompt_value = lm_input
     elif isinstance(lm_input, str):
@@ -182,6 +193,22 @@ def convert_lm_input_to_basic_string(lm_input: LanguageModelInput) -> str:
         )
 
     return prompt_value.to_string()
+
+def convert_lm_input_to_lm_studio_messages(lm_input: LanguageModelInput) -> str:
+    # Take lm_input, which is a list of SystemMessage and HumanMessage, and convert it to an array of objects, if the item in the list is SystemMessage, create a dict with the key role and value "system", and the key "content" with the value of SystemMessage
+    # if the item in the list is HumanMessage, create a dict with the key role and value "user", and the key "content" with the value of HumanMessage
+    lm_studio_messages = []
+    for item in lm_input:
+        if isinstance(item, SystemMessage):
+            lm_studio_messages.append({"role": "system", "content": item.content})
+        elif isinstance(item, HumanMessage):
+            lm_studio_messages.append({"role": "user", "content": item.content})
+        else:
+            raise ValueError(
+                f"Invalid input type {type(item)}. "
+                "Must be a SystemMessage or HumanMessage."
+            )
+    return lm_studio_messages
 
 
 def message_generator_to_string_generator(

@@ -3,6 +3,7 @@ from danswer.configs.chat_configs import QA_TIMEOUT
 from danswer.configs.model_configs import GEN_AI_MODEL_PROVIDER
 from danswer.llm.chat_llm import DefaultMultiLLM
 from danswer.llm.custom_llm import CustomModelServer
+from danswer.llm.lm_studio import LMStudioServer
 from danswer.llm.exceptions import GenAIDisabledException
 from danswer.llm.gpt_4_all import DanswerGPT4All
 from danswer.llm.interfaces import LLM
@@ -32,6 +33,9 @@ def get_default_llm(
 
     if gen_ai_model_provider.lower() == "custom":
         return CustomModelServer(api_key=api_key, timeout=timeout)
+
+    if gen_ai_model_provider.lower() == "lmstudio":
+        return LMStudioServer(api_key=api_key, timeout=timeout)
 
     if gen_ai_model_provider.lower() == "gpt4all":
         return DanswerGPT4All(model_version=model_version, timeout=timeout)
